@@ -64,6 +64,17 @@ func startServer(port string, certFolder string) {
 	log.Println("Configuring router")
 	r := mux.NewRouter()
 
+	// Heartbeat Endpoint (/):
+	// This endpoint is designed to check the health of the service.
+	// Details:
+	// - Purpose: To check the health of the service.
+	// - Functionality: The endpoint returns a simple "OK" response.
+	// - Output: A string indicating that the service is alive.
+	// - Use Case: This endpoint can be used to check the health of the service.
+	//
+	// TODO: Add Version Information, Database Connection Status, Persistent Storage Status, etc.
+	r.HandleFunc("/", HeartbeatHandler).Methods("GET")
+
 	// Prove Endpoint (/prove):
 	// This endpoint is designed to provide a cryptographic hash of a piece of data to demonstrate its possession without revealing the actual data.
 	// Details:
@@ -133,6 +144,12 @@ func stopServer() {
 }
 
 // HANDLER FUNCTIONS (PUBLIC)
+
+// HeartbeatHandler checks the health of the service. For simplicity, we'll just send an "OK" response.
+func HeartbeatHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Service is alive!")
+}
 
 // ProveHandler handles the /prove endpoint.
 func ProveHandler(w http.ResponseWriter, r *http.Request) {

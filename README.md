@@ -2,6 +2,8 @@
 
 This repository provides an implementation of a zero-knowledge proof system in Go, allowing nodes to prove the possession of certain data without revealing the data itself. The system uses SHA-256 for hashing and offers an API for data broadcast, receipt, and acknowledgment between nodes.
 
+This repository also makes use of The http/2 API Server located at https://github.com/AndrewDonelson/go-http2-api
+
 ## Project Structure
 
 - `pkg/zeroknowledge.go`: Contains the core logic for generating and verifying hashes.

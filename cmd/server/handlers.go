@@ -1,21 +1,42 @@
-package api
+package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 
 	gzp "github.com/AndrewDonelson/go-zeroknowledge-proof/pkg/zeroknowledge"
 )
 
-// HANDLER FUNCTIONS (PUBLIC) - Add your handlers here
+// Mock node ID for the current node (in a real-world scenario, this would be dynamically assigned or configured)
+const currentNodeID = "node_123"
 
-// HeartbeatHandler checks the health of the service. For simplicity, we'll just send an "OK" response.
-func HeartbeatHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "Service is alive!")
+// Define a struct for the broadcast payload
+type BroadcastPayload struct {
+	Data               string `json:"data"`
+	Proof              string `json:"proof"`
+	OriginatingNodeURL string `json:"originatingNodeURL"`
 }
+
+// Define a struct for the acknowledgment payload
+type AcknowledgmentPayload struct {
+	DataID string `json:"dataId"`
+	NodeID string `json:"nodeId"`
+	Status string `json:"status"`
+}
+
+// authorizedNodes is a List of authorized nodes (for simplicity, using hardcoded URLs; in a real-world scenario, use a dynamic registry or DB)
+var authorizedNodes = []string{
+	"https://node1.example.com",
+	"https://node2.example.com",
+	// ... add other node URLs here ...
+}
+
+// nodeDataStorage is a struct to represent the data storage (for simplicity, using a map; in a real-world scenario, you'd use a database or other persistent storage)
+var nodeDataStorage = map[string]string{} // key: data, value: proof
 
 // ProveHandler handles the /prove endpoint.
 func ProveHandler(w http.ResponseWriter, r *http.Request) {
@@ -112,4 +133,37 @@ func AcknowledgeHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Respond with a simple acknowledgment receipt message
 	w.Write([]byte("Acknowledgment received"))
+}
+
+// Helper function to broadcast data to a specific node
+func broadcastToNode(nodeURL string, payload BroadcastPayload) {
+	data, _ := json.Marshal(payload)
+	resp, err := http.Post(nodeURL+"/receive", "application/json", bytes.NewBuffer(data))
+	if err != nil {
+		log.Printf("Failed to broadcast to node %s: %v", nodeURL, err)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	log.Printf("Node %s response: %s", nodeURL, body)
+}
+
+// Helper function to send acknowledgment to a specific node
+func sendAcknowledgmentToNode(nodeURL, dataID, status string) {
+	payload := AcknowledgmentPayload{
+		DataID: dataID,
+		NodeID: currentNodeID,
+		Status: status,
+	}
+	data, _ := json.Marshal(payload)
+	resp, err := http.Post(nodeURL+"/acknowledge", "application/json", bytes.NewBuffer(data))
+	if err != nil {
+		log.Printf("Failed to send acknowledgment to node %s: %v", nodeURL, err)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	log.Printf("Node %s acknowledgment response: %s", nodeURL, body)
 }

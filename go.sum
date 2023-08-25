@@ -1,2 +1,4 @@
+github.com/AndrewDonelson/go-http2-api v0.0.0-20230824231016-7002d4d771f1 h1:k4zXHFUuzo8mO7ES9doc62Ik3TuYwRr+sbQDX05R7GM=
+github.com/AndrewDonelson/go-http2-api v0.0.0-20230824231016-7002d4d771f1/go.mod h1:mbovCeXs0ft1kH4clitdL+3nasT2GMgbTU/nNQqvh2A=
 github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
 github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
